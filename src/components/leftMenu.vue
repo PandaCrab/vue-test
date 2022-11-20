@@ -50,6 +50,9 @@
     .container {
         width: 20px;
         height: 20px;
+        position:absolute;
+        left: 5px;
+        top: 5px;
     }
 
     .menuBtn {
@@ -89,8 +92,8 @@
         border-right: 1px solid #bbbbbb;
         box-shadow: 2px 0 10px gray;
         position: absolute;
-        top: 0;
-        left: 0;
+        top: -5px;
+        left: -5px;
         overflow: hidden;
     }
 

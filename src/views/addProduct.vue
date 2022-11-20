@@ -7,7 +7,7 @@
             }
         },
         methods: {
-            submit() {
+            onSubmit() {
                 console.log(this.formValues);
             },
             onChange({ target }) {
@@ -24,37 +24,37 @@
 
 <template>
     <div class="container">
-        <form class="addProductForm" @submit="submit()">
+        <div class="addProductForm">
             <input
                 name="name"
-                class="input"
+                class="formInput"
                 v-model="formValues.name"
                 @change="(event) => onChange(event)"
                 placeholder="Name of product"
             />
             <input
                 name="price"
-                class="input"
+                class="formInput"
                 v-model="formValues.price"
                 @change="(event) => onChange(event)"
                 placeholder="Product price"
-            />{{this.formValues.price}}
+            />
             <input
                 name="imgUrl"
-                class="input"
+                class="formInput"
                 v-model="formValues.imgUrl"
                 @change="(event) => onChange(event)"
                 placeholder="Url for product image"
             />
             <input
                 name="quantity"
-                class="input"
+                class="formInput"
                 v-model="formValues.quantity"
                 @change="(event) => onChange(event)"
                 placeholder="Product quantity"
-            />{{this.formValues.quantity}}
-            <button type="submit">Submit</button>
-        </form>
+            />
+            <button @click="onSumbit">Submit</button>
+        </div>
     </div>
 </template>
 
@@ -64,6 +64,23 @@
         padding: 20px;
         display: flex;
         flex-direction: column;
+    }
 
+    .addProductForm {
+        width: 290px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        align-self: center;
+        font-size: 16px;
+    }
+
+    .formInput {
+        margin-bottom: 10px;
+        padding: 6px 12px;
+        width: 100%;
+        text-align: start;
+        border: 1px solid #bbbbbb;
+        border-radius: 5px;
     }
 </style>

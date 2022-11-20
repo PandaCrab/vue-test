@@ -1,18 +1,19 @@
-import { createRouter, createWebHashHistory } from 'vue-router';
+import { createRouter, createWebHistory } from 'vue-router';
 
 import HomePage from '../views/homePage.vue';
 import AddProduct from '../views/addProduct.vue';
-
-const Products = { template: '<div>Hello in product page</div>' };
+import StorageProducts from '../views/storageProducts.vue';
+import ProductInfo from '../views/productInfo.vue';
 
 const routes = [
     { path: '/', name: 'HomePage', component: HomePage },
-    { path: '/products', component: Products },
+    { path: '/products', name: 'StorageProduct', component: StorageProducts },
     { path: '/add_product', name: 'AddProduct', component: AddProduct },
+    { path: '/product/:id', name: 'ProductInfo', component: ProductInfo },
 ];
 
 const router = createRouter({
-    history: createWebHashHistory(),
+    history: createWebHistory(),
     routes
 });
 
