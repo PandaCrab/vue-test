@@ -5,10 +5,22 @@ import router from './routes';
 
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
-import { faUserSecret, faBars, faXmark, faChevronUp } from '@fortawesome/free-solid-svg-icons';
+import {
+    faUserSecret,
+    faBars,
+    faXmark,
+    faChevronUp,
+    faArrowLeft,
+} from '@fortawesome/free-solid-svg-icons';
 
 /* add icons to the library */
-library.add(faUserSecret, faBars, faXmark, faChevronUp);
+library.add(
+    faUserSecret,
+    faBars,
+    faXmark,
+    faChevronUp,
+    faArrowLeft,
+);
 
 const app = createApp(App);
 

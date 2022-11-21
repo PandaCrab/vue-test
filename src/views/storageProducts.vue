@@ -8,7 +8,8 @@ import { getProducts } from '../api/api';
             products: [],
             isPreview: false,
             search: '',
-            filtered: [],
+            filtered: null,
+            error: ''
         }),
         created() {
             this.takeProducts()
@@ -21,8 +22,12 @@ import { getProducts } from '../api/api';
                 try {
                     const fetched = await getProducts();
 
-                    if (fetched) {
+                    if (fetched.length) {
                         this.products = await fetched;
+                    }
+
+                    if (fetched.message) {
+                        return this.error = `Fetch problems: ${fetched.message}`
                     }
 
                     return null
@@ -37,8 +42,12 @@ import { getProducts } from '../api/api';
                     if (filter.length) {
                         this.filtered = filter;
                     }
+
+                    if (!filter.length) {
+                        this.filtered = `Didn't find anything`
+                    }
                 } else {
-                    this.filtered = [];
+                    this.filtered = null;
                 }
             }
         },
@@ -57,7 +66,7 @@ import { getProducts } from '../api/api';
             v-if="this.products.length"
             v-model="search"
         />
-        <div class="productsList" v-if="this.filtered.length">
+        <div class="productsList" v-if="(filtered instanceof Array)">
             <div 
                 class="product"
                 v-for="product in filtered" 
@@ -75,7 +84,7 @@ import { getProducts } from '../api/api';
             </div>
 
         </div>
-        <div class="productsList" v-else-if="this.products.length">
+        <div class="productsList" v-else-if="!filtered && this.products?.length">
             <div 
                 class="product"
                 v-for="product in products" 
@@ -92,6 +101,8 @@ import { getProducts } from '../api/api';
                 <div class="name">{{product.name}}</div>
             </div>
         </div>
+        <div v-else-if="filtered && !(filtered instanceof Array)">{{this.filtered}}</div>
+        <div class="errorWrapper" v-else-if="this.error">{{error}}</div>
         <div class="loader" v-else>
             <loaderComponent />
         </div >
