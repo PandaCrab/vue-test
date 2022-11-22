@@ -43,8 +43,18 @@ export const getProduct = async (id) => {
 
 export const postProduct = async (data) => {
     try {
-        await fetchFunc(url + '/storage/create', data, 'POST');
+        await fetchFunc(url + '/storage/create', 'POST', data);
     } catch (err) {
         console.log(err);
+    }
+};
+
+export const updateProduct = async (data) => {
+    try {
+        const res = await fetchFunc(url + '/storage', 'PUT', data);
+
+        return res.json();
+    } catch (err) {
+        return err;
     }
 };

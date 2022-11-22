@@ -1,6 +1,6 @@
 <script>
-import loaderComponent from '../components/loaderComponent.vue';
-import { getProducts } from '../api/api';
+import loaderComponent from '@/components/loaderComponent.vue';
+import { getProducts } from '@/api/api';
 
     export default {
         name: 'StorageProducts',
@@ -96,6 +96,8 @@ import { getProducts } from '../api/api';
                 <img
                     :src="product.imgUrl"
                     :alt="product.name"
+                    :width="product.width"
+                    :height="product.height"
                     class="image"
                 />
                 <div class="name">{{product.name}}</div>

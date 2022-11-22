@@ -1,12 +1,15 @@
 <script>
-    import { getProduct } from '@/api/api';
+    import { getProduct, updateProduct } from '@/api/api';
 
     export default {
         name: 'ProductInfo',
         data() {
             return {
                 product: {},
-                isRewriting: false
+                toUpdate: {
+                    _id: this.product?._id
+                },
+                isRewriting: false,
             }
         },
         created() {
@@ -15,11 +18,15 @@
         },
         methods: {
             async catchProduct() {
-                const id = await this.$route.params?.id;
-                const product = await getProduct(id);
+                try {
+                    const id = await this.$route.params?.id;
+                    const product = await getProduct(id);
 
-                if (product) {
-                    this.product = product;
+                    if (product) {
+                        this.product = product;
+                    }
+                } catch (err) {
+                    console.log(err);
                 }
             },
             getRating({ stars }) {
@@ -34,14 +41,50 @@
                 } else {
                     return null;
                 }
-            }
+            },
+            catchForUpdate({ target }) {
+                const { name, value } = target;
+
+                this.toUpdate = {
+                    ...this.toUpdate,
+                    [name]: value,
+                };
+            },
+            async postUpdateInfo(data) {{
+                try {
+                    if (data) {
+                        const res = await updateProduct(data);
+
+                        if (res.message) {
+                            this.isRewriting = false;
+                            console.log(res)
+                        }
+                    }
+                } catch (err) {
+                    console.log(err);
+                }
+                
+            }}
         },
     }
 </script>
 
 <template>
     <div class="container">
-        <button class="backBtn" @click="this.$router.back"><font-awesome-icon icon="fa-solid fa-arrow-left" /></button>
+        <div class="btnWrapper">
+            <button class="rewriteBtn" @click="this.isRewriting = true" v-if="!isRewriting">
+                <div class="btnIcon"><font-awesome-icon icon="fa-solid fa-pen" /></div>
+                <div class="btnText">Change</div>
+            </button>
+            <button class="backBtn" @click="this.$router.back" v-if="!isRewriting">
+                <div class="btnIcon"><font-awesome-icon icon="fa-solid fa-arrow-left" /></div>
+                <div class="btnText">Go back</div>
+            </button>
+            <button class="closeBtn" @click="this.isRewriting = false" v-else>
+                <div class="btnIcon"><font-awesome-icon icon="fa-solid fa-xmark" /></div>
+                <div class="btnText">Close</div>
+            </button>
+        </div>
         <div class="inforewrite" v-if="isRewriting">
             <div class="wrapper">
                 <div class="imageInfo">
@@ -103,16 +146,17 @@
                     </div>
                     <div class="row">
                         <div class="title">Rating</div>
-                        <div class="infoItem">{{product?.rating}}</div>
+                        <div class="infoItem">{{getRating(product)}}</div>
                     </div>
                 </div>
             </div>
             <textarea
-                col="100"
-                row="150"
+                class="descriptionTextarea"
                 :value="product?.description"
                 @change="({ target }) => this.product.description = target.value"
-            />{{product?.description}}
+                placeholder="Add a description to a product"
+            />
+            <button class="submitBtn" @click="postUpdateInfo(this.product)">Submit</button>
         </div>
         <div class="infoWrapper" v-else>
             <div class="wrapper">
@@ -153,24 +197,94 @@
 
 <style scoped lang="scss">
     $lightGrayBorder: #bbbbbb;
+    $borderHover: black;
+    $backgroundColor: black;
+    $hoverTextColor: white;
+    $containerBackground: white;
 
     .container {
         margin: auto;
         padding: 5px;
-        width: 95%;
+        width: 90%;
         display: flex;
         flex-direction: column;
         align-items: center;
+        background-color: $containerBackground;
         border: 1px solid $lightGrayBorder;
         border-radius: 5px;
         position: relative;
+
+        .btnWrapper {
+            padding: 5px;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+
+            .backBtn,
+            .rewriteBtn,
+            .closeBtn {
+                width: 20px;
+                height: 20px;
+                display: flex;
+                align-items: center;
+                align-self: flex-end;
+                justify-content: center;
+                background: none;
+                border: 1px solid $lightGrayBorder;
+                border-radius: 50%;
+                transition: width .1s linear;
+
+                .btnIcon {
+                    display: flex;
+                }
+
+                .btnText {
+                    display: none;
+                }
+
+                &:hover {
+                    width: 90px;
+                    border-radius: 5px;
+                    border-color: $borderHover;
+                    background-color: $backgroundColor;
+                    color: $hoverTextColor;
+
+                    .btnIcon {
+                        display: none;
+                    }
+
+                    .btnText {
+                        height: 20px;
+                        display: flex;
+                        align-items: center;
+                        white-space: nowrap;
+                    }
+                }
+            }
+        }
 
         .wrapper {
             margin-bottom: 10px;
             display: flex;
             flex-direction: column;
             align-items: center;
-            
+
+            .rewriteInput {
+                padding: 4px 8px;
+                width: 100px;
+                border: 1px solid $lightGrayBorder;
+                border-radius: 5px;
+            }
+
+            .imageInfo {
+                margin-bottom: 10px;
+                width: 100%;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+            }
+
             .productImage {
                 margin-bottom: 10px;
             }
@@ -183,7 +297,7 @@
 
                 .row {
                     margin-bottom: 2px;
-                    padding-bottom: 1px;
+                    padding-bottom: 3px;
                     width: 100%;
                     display: flex;
                     align-items: center;
@@ -194,6 +308,33 @@
                         font-weight: bold;
                     }
                 }
+            }
+        }
+
+        .descriptionTextarea {
+            margin-bottom: 10px;
+            width: 100%;
+            height: 200px;
+            display: flex;
+            resize: none;
+            font-size: 16px;
+            text-align: start;
+        }
+
+        .submitBtn {
+            margin: auto;
+            padding: 5px 10px;
+            width: 100px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: none;
+            border: 1px solid $lightGrayBorder;
+            border-radius: 5px;
+
+            &:hover {
+                background-color: $backgroundColor;
+                color: $hoverTextColor;
             }
         }
     }
