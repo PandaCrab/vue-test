@@ -1,12 +1,16 @@
 <script>
 import loaderComponent from '@/components/loaderComponent.vue';
+import PreviewCard from '@/components/previewCard.vue';
 import { getProducts } from '@/api/api';
 
     export default {
         name: 'StorageProducts',
         data: () => ({
             products: [],
-            isPreview: false,
+            isPreview: {
+                inPreview: '',
+                preview: false
+            },
             search: '',
             filtered: null,
             error: ''
@@ -16,6 +20,11 @@ import { getProducts } from '@/api/api';
         },
         watch: {
             search: 'onSearch'
+        },
+        computed: {
+            onPreview(product) {
+                return this.isProview?.preivew && this.isPreview.inPreview === product._id
+            }
         },
         methods: {
             async takeProducts() {
@@ -35,6 +44,19 @@ import { getProducts } from '@/api/api';
                     this.error = 'Fetch problems:' + err
                 }
             },
+            togglePreview(product) {
+                if (product) {
+                    this.isPreview = (prev) => ({
+                        inPreview: prev.inPreview ? '' : product._id,
+                        preview: !prev.preview
+                    });
+                }
+
+                this.isPreview = {
+                    inPreview: '',
+                    preview: false
+                };
+            },
             onSearch() {
                 if (this.search.length >= 3) {
                     const filter = this.products.filter(el => el.name.toLowerCase().includes(this?.search));
@@ -52,9 +74,10 @@ import { getProducts } from '@/api/api';
             }
         },
         components: {
-            loaderComponent
+            loaderComponent,
+            PreviewCard
         }
-    }
+    };
 </script>
 
 <template>
@@ -81,6 +104,11 @@ import { getProducts } from '@/api/api';
                     class="image"
                 />
                 <div class="name">{{product.name}}</div>
+                <div class="previewBtn" @click="() => togglePreview(product)">
+                    <font-awesome-icon v-if="this.onPreview(product)" icon="fa-solid fa-eye" />
+                    <font-awesome-icon v-else icon="fa-regular fa-eye" />
+                </div>
+                <PreviewCard :product="product" :closePreview="togglePreview()" />
             </div>
 
         </div>
@@ -90,8 +118,6 @@ import { getProducts } from '@/api/api';
                 v-for="product in products" 
                 :key="product._id"
                 @click="() => this.$router.push(`/product/${product._id}`)"
-                @mousedown="this.isPreview = true"
-                @mouseup="this.isPreview = false"
             >
                 <img
                     :src="product.imgUrl"
@@ -101,6 +127,10 @@ import { getProducts } from '@/api/api';
                     class="image"
                 />
                 <div class="name">{{product.name}}</div>
+                <div class="previewBtn" @click="() => togglePreview(product)">
+                    <font-awesome-icon v-if="this.onPreview(product)" icon="fa-solid fa-eye" />
+                    <font-awesome-icon v-else icon="fa-regular fa-eye" />
+                </div>
             </div>
         </div>
         <div v-else-if="filtered && !(filtered instanceof Array)">{{this.filtered}}</div>
