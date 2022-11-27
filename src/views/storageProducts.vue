@@ -1,6 +1,5 @@
 <script>
 import loaderComponent from '@/components/loaderComponent.vue';
-import PreviewCard from '@/components/previewCard.vue';
 import { getProducts } from '@/api/api';
 
     export default {
@@ -46,10 +45,10 @@ import { getProducts } from '@/api/api';
             },
             togglePreview(product) {
                 if (product) {
-                    this.isPreview = (prev) => ({
-                        inPreview: prev.inPreview ? '' : product._id,
-                        preview: !prev.preview
-                    });
+                    this.isPreview = {
+                        inPreview: this.inPreview ? '' : product._id,
+                        preview: !this.preview
+                    };
                 }
 
                 this.isPreview = {
@@ -75,7 +74,6 @@ import { getProducts } from '@/api/api';
         },
         components: {
             loaderComponent,
-            PreviewCard
         }
     };
 </script>
@@ -89,12 +87,12 @@ import { getProducts } from '@/api/api';
             v-if="this.products.length"
             v-model="search"
         />
-        <div class="productsList" v-if="(filtered instanceof Array)">
+        <div v-if="filtered && !(filtered instanceof Array)">{{this.filtered}}</div>
+        <div class="productsList" v-else-if="(filtered instanceof Array) || this.products.length">
             <div 
                 class="product"
-                v-for="product in filtered" 
+                v-for="product in ((filtered instanceof Array) ? filtered : products)" 
                 :key="product._id"
-                @click="() => this.$router.push(`/product/${product._id}`)"
                 @mousedown="this.isPreview = true"
                 @mouseup="this.isPreview = false"
             >
@@ -103,37 +101,14 @@ import { getProducts } from '@/api/api';
                     :alt="product.name"
                     class="image"
                 />
-                <div class="name">{{product.name}}</div>
+                <div class="name" @click="() => this.$router.push(`/product/${product._id}`)">{{product.name}}</div>
                 <div class="previewBtn" @click="() => togglePreview(product)">
-                    <font-awesome-icon v-if="this.onPreview(product)" icon="fa-solid fa-eye" />
-                    <font-awesome-icon v-else icon="fa-regular fa-eye" />
+                    <font-awesome-icon v-if="!this.isPreview.preview" icon="fa-regular fa-eye" />
+                    <font-awesome-icon v-else icon="fa-solid fa-eye" />
                 </div>
-                <PreviewCard :product="product" :closePreview="togglePreview()" />
             </div>
 
         </div>
-        <div class="productsList" v-else-if="!filtered && this.products?.length">
-            <div 
-                class="product"
-                v-for="product in products" 
-                :key="product._id"
-                @click="() => this.$router.push(`/product/${product._id}`)"
-            >
-                <img
-                    :src="product.imgUrl"
-                    :alt="product.name"
-                    :width="product.width"
-                    :height="product.height"
-                    class="image"
-                />
-                <div class="name">{{product.name}}</div>
-                <div class="previewBtn" @click="() => togglePreview(product)">
-                    <font-awesome-icon v-if="this.onPreview(product)" icon="fa-solid fa-eye" />
-                    <font-awesome-icon v-else icon="fa-regular fa-eye" />
-                </div>
-            </div>
-        </div>
-        <div v-else-if="filtered && !(filtered instanceof Array)">{{this.filtered}}</div>
         <div class="errorWrapper" v-else-if="this.error">{{error}}</div>
         <div class="loader" v-else>
             <loaderComponent />
@@ -192,6 +167,15 @@ import { getProducts } from '@/api/api';
                     width: 40px;
                     height: 50px;
 
+                }
+
+                .previewBtn {
+                    width: 30px;
+                    height: 100%;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    border-left: 1px solid $lightGrayBorder;
                 }
             }
         }

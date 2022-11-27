@@ -6,7 +6,22 @@
                 isOpen: false,
             }
         },
+        updated() {
+            this.$nextTick(() => {
+                if (this.isOpen) {
+                    window.addEventListener('mousedown', this.clickOutside);
+                }
+
+                return () => window.removeEventListener('mousedown', this.clickOutside);
+            })
+        },
         methods: {
+            clickOutside({ target }) {
+                const el = this.$refs.menuRef;
+                if (el && !el?.contains(target)) {
+                    this.isOpen = false;
+                }
+            },
             toggleMenu() {
                 this.isOpen = !this.isOpen;
             },
@@ -22,11 +37,11 @@
 </script>
 
 <template>
-    <div class="container">
+    <div class="container" ref="menuRef">
         <button class="menuBtn" @click="toggleMenu">
             <font-awesome-icon icon="fa-solid fa-bars" />
         </button>
-        <div class="menu" v-if="isOpen">
+        <div :class="`menu ${this.isOpen ? 'open' : 'close'}`">
             <button class="menuBtn closeBtn" @click="closeMenu">
                 <font-awesome-icon icon="fa-solid fa-xmark" />
             </button>
@@ -87,7 +102,6 @@
         }
 
         .menu {
-            width: 270px;
             height: 100vh;
             display: flex;
             flex-direction: column;
@@ -100,6 +114,17 @@
             left: -5px;
             overflow: hidden;
             z-index: 1000;
+            transition: width .2s linear;
+
+            &.open {
+                width: 270px;
+            }
+
+            &.close {
+                width: 0;
+                border: none;
+                box-shadow: none;
+            }
 
             .title {
                 margin-bottom: 15px;
@@ -117,14 +142,15 @@
                 width: 100%;
                 font-size: 16px;
                 text-align: start;
+                white-space: nowrap;
 
-                .menuItem a {
+                &a {
                 width: 100%;
                 color: black;
                 text-decoration: none;
                 }
 
-                .menuItem:hover {
+                &:hover {
                     background-color: #c0c0c0;
 
                 }

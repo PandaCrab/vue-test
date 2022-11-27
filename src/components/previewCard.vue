@@ -4,12 +4,27 @@
         props: {
             product: Object,
             closePreview: Function,
+        },
+        methods: {
+            clickOutside({ target }) {
+                const el = this.$refs.cardRef;
+
+                if (!el?.contains(target)) {
+                    this.closePreview();
+                }
+            },
+        },
+        created() {
+            document.addEventListener('mousedown', this.clickOutside);
+        },
+        unmounted() {
+            () => document.removeEventListener('mousedown', this.clickOutside);
         }
     }
 </script>
 
 <template>
-    <div class="cardContainer">
+    <div class="cardContainer" ref="cardRef">
         <button class="closeBtn" @click="this.closePreview()">
             <font-awesome-icon icon="fa-solid fa-xmark" />
         </button>
