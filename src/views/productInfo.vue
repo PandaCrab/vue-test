@@ -14,7 +14,6 @@
         },
         created() {
             this.catchProduct();
-            console.log(this.$route.params.id)
         },
         methods: {
             async catchProduct() {

@@ -8,4 +8,5 @@ export const addProductSchema = yup.object().shape({
     quantity: yup.number().required('Quantity field is required'),
     category: yup.string().required('Choose category'),
     subcategory: yup.string().notRequired(),
+    description: yup.string().required('Product description is required')
 });

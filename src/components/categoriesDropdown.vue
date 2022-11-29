@@ -115,20 +115,20 @@
 <template>
     <div class="dropdownWrapper" ref="dropdownRef">
         <div class="category">
-            <div class="dropdown">
+            <div :class="`dropdown ${this.invalidCategory && 'error'}`">
                 <input
                     name="searchInput"
-                    class="dropdownText"
                     ref="searchInput"
+                    :class="`dropdownText ${this.invalidCategory && 'error'}`"
                     :value="this.search"
                     @change="({ target }) => this.search = target.value"
                     autofocuse
-                    :placeholder="this.selectedItem.category ?? 'Category'"
+                    :placeholder="'Category' ?? this.selectedItem.category"
                     v-if="this.isOpen.categories"
                 />
                 <input
                     readonly
-                    class="dropdownText"
+                    :class="`dropdownText ${this.invalidCategory && 'error'}`"
                     :value="this.selectedItem.category"
                     :placeholder="'Category' ?? this.selectedItem.category"
                     @click="() => toggleDropdown('categories')"
@@ -200,9 +200,11 @@
     @use '../assets/styles/mixins/ScrollbarMixin.module.scss' as *;
 
     $lightGrayBorder: #bbbbbb;
+    $errorBorder: red;
     $itemBackground: #fafafa;
     $shadowColor: gray;
     $white: white;
+    $red: red;
 
     .dropdownWrapper {
         width: 100%;
@@ -227,6 +229,10 @@
                 border-radius: 5px;
                 position: relative;
 
+                &.error {
+                    border-color: $errorBorder;
+                }
+
                 .dropdownText {
                     padding: 6px 12px;
                     width: 80%;
@@ -236,6 +242,13 @@
 
                     &:focus {
                         outline: none;
+                    }
+
+                    &.error {
+                        &::placeholder {
+                            color: $red;
+                            opacity: .7;
+                        }
                     }
                 }
 

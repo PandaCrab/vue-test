@@ -1,15 +1,14 @@
 <script>
 import loaderComponent from '@/components/loaderComponent.vue';
+import PreviewCard from '@/components/previewCard.vue';
 import { getProducts } from '@/api/api';
 
     export default {
         name: 'StorageProducts',
         data: () => ({
             products: [],
-            isPreview: {
-                inPreview: '',
-                preview: false
-            },
+            isPreview: false,
+            inPreview: {},
             search: '',
             filtered: null,
             error: ''
@@ -18,12 +17,7 @@ import { getProducts } from '@/api/api';
             this.takeProducts()
         },
         watch: {
-            search: 'onSearch'
-        },
-        computed: {
-            onPreview(product) {
-                return this.isProview?.preivew && this.isPreview.inPreview === product._id
-            }
+            search: 'onSearch',
         },
         methods: {
             async takeProducts() {
@@ -45,16 +39,17 @@ import { getProducts } from '@/api/api';
             },
             togglePreview(product) {
                 if (product) {
-                    this.isPreview = {
-                        inPreview: this.inPreview ? '' : product._id,
-                        preview: !this.preview
-                    };
+                    if (product._id === this.inPreview._id) {
+                        this.isPreview = false;
+                        this.inPreview = {};
+                    } else {
+                        this.isPreview = !this.isPreview;
+                        this.inPreview = product;
+                    }
+                } else {
+                    this.isPreview = false;
+                    this.inPreview = {};
                 }
-
-                this.isPreview = {
-                    inPreview: '',
-                    preview: false
-                };
             },
             onSearch() {
                 if (this.search.length >= 3) {
@@ -70,10 +65,11 @@ import { getProducts } from '@/api/api';
                 } else {
                     this.filtered = null;
                 }
-            }
+            },
         },
         components: {
             loaderComponent,
+            PreviewCard
         }
     };
 </script>
@@ -93,8 +89,6 @@ import { getProducts } from '@/api/api';
                 class="product"
                 v-for="product in ((filtered instanceof Array) ? filtered : products)" 
                 :key="product._id"
-                @mousedown="this.isPreview = true"
-                @mouseup="this.isPreview = false"
             >
                 <img
                     :src="product.imgUrl"
@@ -103,11 +97,15 @@ import { getProducts } from '@/api/api';
                 />
                 <div class="name" @click="() => this.$router.push(`/product/${product._id}`)">{{product.name}}</div>
                 <div class="previewBtn" @click="() => togglePreview(product)">
-                    <font-awesome-icon v-if="!this.isPreview.preview" icon="fa-regular fa-eye" />
-                    <font-awesome-icon v-else icon="fa-solid fa-eye" />
+                    <font-awesome-icon v-if="product._id === this.inPreview?._id" icon="fa-solid fa-eye" />
+                    <font-awesome-icon v-else icon="fa-regular fa-eye" />
                 </div>
+                <PreviewCard
+                    v-if="this.isPreview"
+                    :product="this.inPreview"
+                    :closePreview="() => togglePreview()"
+                />
             </div>
-
         </div>
         <div class="errorWrapper" v-else-if="this.error">{{error}}</div>
         <div class="loader" v-else>

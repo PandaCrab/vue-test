@@ -83,6 +83,7 @@
             background-color: $white;
             border: 1px solid $lightGrayBorder;
             border-radius: 50%;
+            cursor: pointer;
             position: absolute;
             top: -15px;
             right: -15px;
@@ -96,6 +97,7 @@
             .productImage {
             margin-right: 10px;
             width: 50%;
+            height: 130px;
             }
 
             .productInfo {
