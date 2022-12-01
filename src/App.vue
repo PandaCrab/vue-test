@@ -1,6 +1,5 @@
 <template>
   <LeftMenu />
-  <img alt="Vue logo" src="./assets/logo.png">
   <router-view />
 </template>
 
@@ -24,6 +23,7 @@ html, body {
 #app {
   margin: 0;
   padding: 0;
+  padding-top: 40px;
   width: 100%;
   font-family: Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;

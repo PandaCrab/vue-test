@@ -16,6 +16,9 @@
                 }
             }
         },
+        updated() {
+            console.log(this?.formValues)
+        },  
         methods: {
             onSubmit() {
                 addProductSchema
@@ -64,11 +67,11 @@
                         category: item.category,
                         subcategory: item.subcategory
                     };
-                }
-
-                this.formValues = {
+                } else {
+                    this.formValues = {
                     ...this.formValues,
                     category: item
+                    }
                 }
             }
         },
@@ -116,6 +119,26 @@
                     placeholder="Url for product image"
                 />
                 <error-tooltip v-if="invalid.path.imgUrl" :message="invalid.path.imgUrl" />
+            </div>
+            <div class="inputWrapper">
+                <input
+                    name="width"
+                    :class="`formInput ${this.invalid.path.width && 'error'}`"
+                    :value="formValues.width"
+                    @change="(event) => onChange(event)"
+                    placeholder="With of product image"
+                />
+                <error-tooltip v-if="invalid.path.width" :message="invalid.path.width" />
+            </div>
+            <div class="inputWrapper">
+                <input
+                    name="height"
+                    :class="`formInput ${this.invalid.path.height && 'error'}`"
+                    :value="formValues.height"
+                    @change="(event) => onChange(event)"
+                    placeholder="Height of product image"
+                />
+                <error-tooltip v-if="invalid.path.height" :message="invalid.path.height" />
             </div>
             <div class="inputWrapper">
                 <input
@@ -200,7 +223,7 @@
             font-size: 16px;
 
             .inputWrapper {
-                margin-bottom: 15px;
+                margin-bottom: 20px;
                 width: 100%;
                 position: relative;
                 .formInput {

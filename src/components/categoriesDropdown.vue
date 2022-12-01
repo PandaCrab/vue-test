@@ -60,13 +60,14 @@
             },
             onSelect(item) {
                 const { category, subcategory } = item
+
                 if (subcategory) {
                     this.selected({
-                        category,
+                        category: this.selectedItem.category,
                         subcategory
                     });
                     this.selectedItem = {
-                        category,
+                        ...this.selectedItem,
                         subcategory
                     }
                 }
@@ -74,7 +75,7 @@
                 if (!subcategory) {
                     this.selected(category)
                     this.selectedItem = {
-                        ...this.selectedItem,
+                        subcategory: '',
                         category
                     }
                 }
@@ -185,7 +186,7 @@
             >
                 <div 
                     class="dropdownItem" 
-                    @click="onSelect(item)"
+                    @click="onSelect({subcategory: item})"
                     v-for="item in this.subcategories[selectedItem.category]"
                     :key="item"
                 >

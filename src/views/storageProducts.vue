@@ -164,11 +164,19 @@ import { getProducts } from '@/api/api';
                 .image {
                     width: 40px;
                     height: 50px;
+                }
 
+                .name {
+                    cursor: pointer;
+                    width: stretch;
+                    height: 100%;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
                 }
 
                 .previewBtn {
-                    width: 30px;
+                    width: 40px;
                     height: 100%;
                     display: flex;
                     align-items: center;

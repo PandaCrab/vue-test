@@ -9,7 +9,8 @@ import {
     faArrowLeft,
     faPen,
     faCartShopping,
-    faEye
+    faEye,
+    faTrash
 } from '@fortawesome/free-solid-svg-icons';
 import { faStar, faHeart, faEye as eyeRegular } from '@fortawesome/free-regular-svg-icons';
 
@@ -30,6 +31,7 @@ library.add(
     faHeart,
     faEye,
     eyeRegular,
+    faTrash
 );
 
 const app = createApp(App);

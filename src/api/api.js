@@ -58,3 +58,13 @@ export const updateProduct = async (data) => {
         return err;
     }
 };
+
+export const deleteProduct = async (id) => {
+    try {
+        const res = await fetchFunc(url + '/storage', 'DELETE', { _id: id });
+
+        return res.json();
+    } catch (err) {
+         console.log(err);
+    }
+};
