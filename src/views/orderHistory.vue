@@ -1,6 +1,7 @@
 <script>
+    import FilterBar from '@/components/filterBar.vue';
     import { getAllOrders } from '../api/api';
-    import { sortFunc } from '../helpers/filters';
+    import { filterFunc, sortFunc } from '../helpers/filters';
 
     export default {
         name: 'OrderHistory',
@@ -31,17 +32,29 @@
             },
             onSort(sortBy) {
                 this.filtered = sortFunc(this.allOrders, sortBy);
-            }
+            },
+            onFilter(filterBy) {
+                this.filtered = filterFunc(this.allOrders, filterBy);
+                console.log(this.filtered)
+            },
+        },
+        components: {
+            FilterBar
         }
     }
 </script>
 
 <template>
     <div class="ordersContainer">
+        <FilterBar
+            :setFiltered="(arr) => this.filtered = arr"
+            :sortingArr="this.allOrders"
+            orders
+        />
         <h1>Orders history</h1>
-        <button @click="onSort('date')">online</button>
+        <button @click="onFilter({username: 'John Doe'})">online</button>
         <div class="ordersList" v-if="allOrders?.length">
-            <div class="orderWrapper" v-for="order in (filtered ?? allOrders)" :key="order._id">
+            <div class="orderWrapper" v-for="order in (filtered.length ? filtered : allOrders)" :key="order._id">
                 <button class="infoBtn">
                     <div class="icon"><font-awesome-icon icon="fa-solid fa-info" /></div>
                     <div class="text">More info</div>

@@ -11,9 +11,14 @@ import {
     faCartShopping,
     faEye,
     faTrash,
-    faInfo
+    faInfo,
+    faFilter,
 } from '@fortawesome/free-solid-svg-icons';
-import { faStar, faHeart, faEye as eyeRegular } from '@fortawesome/free-regular-svg-icons';
+import {
+    faStar,
+    faHeart,
+    faEye as regularEye,
+} from '@fortawesome/free-regular-svg-icons';
 
 import App from './App.vue';
 import router from './routes';
@@ -31,9 +36,10 @@ library.add(
     faCartShopping,
     faHeart,
     faEye,
-    eyeRegular,
+    regularEye,
     faTrash,
-    faInfo
+    faInfo,
+    faFilter,
 );
 
 const app = createApp(App);
