@@ -68,3 +68,14 @@ export const deleteProduct = async (id) => {
          console.log(err);
     }
 };
+
+//orders api
+export const getAllOrders = async () => {
+    try {
+        const orders = await fetchFunc(url + '/orders', 'GET');
+
+        return orders.json();
+    } catch (err) {
+        console.log(err);
+    }
+};

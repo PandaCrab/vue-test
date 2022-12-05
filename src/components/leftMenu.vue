@@ -55,8 +55,8 @@
             <div class="menuItem" @click="clickHandler('/add_product')">
                 Add new product
             </div>
-            <div class="menuItem" @click="clickHandler('/test1')">
-                Some interest
+            <div class="menuItem" @click="clickHandler('/order_history')">
+                Orders History
             </div>
             <div class="menuItem" @click="clickHandler('/test2')">
                 Some interest

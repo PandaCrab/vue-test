@@ -1,19 +1,34 @@
 <script>
-    import { getProduct, updateProduct } from '@/api/api';
+    import { getProduct, updateProduct, deleteProduct } from '@/api/api';
+    import { addProductSchema } from '@/helpers/validations';
 
     export default {
         name: 'ProductInfo',
         data() {
             return {
                 product: {},
-                toUpdate: {
-                    _id: this.product?._id
-                },
+                toUpdate: {},
                 isRewriting: false,
+                resError: false,
+                invalid: {
+                    path: {},
+                    isValid: false,
+                },
+                deletion: false,
             }
         },
         created() {
             this.catchProduct();
+        },
+        watch: {
+            deletion: function() {
+                if (this.deletion) {
+                    document.documentElement.style.overflow = 'hidden';
+                    return;
+                }
+
+                document.documentElement.style.overflow = 'auto';
+            }
         },
         methods: {
             async catchProduct() {
@@ -26,6 +41,19 @@
                     }
                 } catch (err) {
                     console.log(err);
+                }
+            },
+            toRewrite() {
+                this.toUpdate = this.product;
+                this.isRewriting = true;
+            },
+            async acceptDelete() {
+                const id = this.$route.params?.id
+                const res = await deleteProduct(id);
+
+                if (res) {
+                    this.deletion = false;
+                    this.$router.back()
                 }
             },
             getRating({ stars }) {
@@ -41,24 +69,54 @@
                     return null;
                 }
             },
-            catchForUpdate({ target }) {
+            onChangeUpdaet({ target }) {
                 const { name, value } = target;
 
                 this.toUpdate = {
                     ...this.toUpdate,
                     [name]: value,
                 };
-            },
-            async postUpdateInfo(data) {{
-                try {
-                    if (data) {
-                        const res = await updateProduct(data);
 
-                        if (res.message) {
-                            this.isRewriting = false;
-                            console.log(res)
+                if (Object.keys(this.invalid.path).includes([name])) {
+                    this.invalid = {
+                        ...this.invalid,
+                        path: {
+                            ...this.invalid.path,
+                            [name]: ''
                         }
-                    }
+                    };
+                }
+            },
+            async postUpdateInfo() {{
+                try {
+                    addProductSchema.validate(this.toUpdate, { abortEarly: false })
+                        .then(async (value) => {
+                            if (value) {
+                                const res = await updateProduct(value);
+
+                                if (res.message) {
+                                    this.isRewriting = false;
+                                }
+
+                                if (res.error) {
+                                    this.resError = res.error
+                                }
+                            }
+                        })
+                        .catch((error) => {
+                            const validationError = {};
+
+                            error.inner.forEach((err) => {
+                                if (err.path) {
+                                    validationError[err.path] = err.message;
+                                }
+                            });
+
+                            this.invalid = {
+                                path: validationError,
+                                isValid: false
+                            };
+                        });
                 } catch (err) {
                     console.log(err);
                 }
@@ -70,8 +128,17 @@
 
 <template>
     <div class="container">
+        <div class="deletionWrapper" v-if="deletion">
+            <div class="deletionAccept">
+                <div>Do You want to delete {{product.name}}</div>
+                <div class="btnWrapper deletion">
+                    <button class="danger" @click="() => acceptDelete()">Yes</button>
+                    <button class="decline" @click="() => this.deletion = false">No</button>
+                </div>
+            </div>
+        </div>
         <div class="btnWrapper">
-            <button class="rewriteBtn" @click="this.isRewriting = true" v-if="!isRewriting">
+            <button class="rewriteBtn" @click="() => toRewrite()" v-if="!isRewriting">
                 <div class="btnIcon"><font-awesome-icon icon="fa-solid fa-pen" /></div>
                 <div class="btnText">Change</div>
             </button>
@@ -79,9 +146,13 @@
                 <div class="btnIcon"><font-awesome-icon icon="fa-solid fa-arrow-left" /></div>
                 <div class="btnText">Go back</div>
             </button>
-            <button class="closeBtn" @click="this.isRewriting = false" v-else>
+            <button class="closeBtn" @click="this.isRewriting = false" v-if="isRewriting">
                 <div class="btnIcon"><font-awesome-icon icon="fa-solid fa-xmark" /></div>
                 <div class="btnText">Close</div>
+            </button>
+            <button class="closeBtn" @click="() => this.deletion = true" v-if="isRewriting">
+                <div class="btnIcon"><font-awesome-icon icon="fa-solid fa-trash" /></div>
+                <div class="btnText">Delete</div>
             </button>
         </div>
         <div class="inforewrite" v-if="isRewriting">
@@ -94,54 +165,90 @@
                         :width="product?.width"
                         :height="product?.height"
                     />
-                    <input
-                        name="imgUrl"
-                        class="rewriteInput"
-                        v-model="product.imgUrl"
-                    />
-                    <input
-                        class="rewriteInput"
-                        name="width"
-                        v-model="product.width"
-                    />
-                    <input
-                        class="rewriteInput"
-                        name="height"
-                        v-model="product.height"
-                    />
+                    <div class="inputWrapper">
+                        <input
+                            name="imgUrl"
+                            class="rewriteInput"
+                            :value="toUpdate.imgUrl"
+                            @change="(event) => onChangeUpdate(event)"
+                            :placeholer="('Image path' ?? toUpdate.imgUrl)"
+                        />
+                        <error-tooltip v-if="invalid.path.imgUrl" :message="invalid.path.imgUrl" />
+                    </div>
+                    <div class="inputWrapper">
+                        <input
+                            type="number"
+                            class="rewriteInput"
+                            name="width"
+                            :value="toUpdate.width"
+                            @change="(event) => onChangeUpdate(event)"
+                            placeholder="Please set width of image"
+                        />
+                        <error-tooltip v-if="invalid.path.width" :message="invalid.path.width" />
+                    </div>
+                    <div class="inputWrapper">
+                        <input
+                            type="number"
+                            class="rewriteInput"
+                            name="height"
+                            :value="(toUpdate.height)"
+                            @change="(event) => onChangeUpdate(event)"
+                            placeholder="Please set height of image"
+                        />
+                        <error-tooltip v-if="invalid.path.height" :message="invalid.path.height" />
+                    </div>
                 </div>
                 <div class="mainInfo">
                     <div class="row">
                         <div class="title">Name</div>
-                        <input
-                            class="rewriteInput"
-                            name="name"
-                            v-model="product.name"
-                        />
+                        <div class="inputWrapper">
+                            <input
+                                class="rewriteInput"
+                                name="name"
+                                :value="toUpdate.name"
+                                @change="(event) => onChangeUpdate(event)"
+                                placeholder="Name of product"
+                            />
+                            <error-tooltip v-if="invalid.path.name" :message="invalid.path.name" />
+                        </div>
                     </div>
                     <div class="row">
                         <div class="title">Price</div>
-                        <input
-                            class="rewriteInput"
-                            name="price"
-                            v-model="product.price"
-                        />
+                        <div class="inputWrapper">
+                            <input
+                                type="number"
+                                class="rewriteInput"
+                                name="price"
+                                :value="toUpdate.price"
+                                @change="(event) => onChangeUpdate(event)"
+                                placeholder="Priduct price"
+                            />
+                            <error-tooltip v-if="invalid.path.price" :message="invalid.path.price" />
+                        </div>
                     </div>
                     <div class="row">
                         <div class="title">Color</div>
-                        <input
-                            class="rewriteInput"
-                            name="color"
-                            v-model="product.color"
-                        />
+                        <div class="inputWrapper">
+                            <input
+                                class="rewriteInput"
+                                name="color"
+                                :value="toUpdate.color"
+                                @change="(event) => onChangeUpdate(event)"
+                                placeholder="Product color"
+                            />
+                            <error-tooltip v-if="invalid.path.color" :message="invalid.path.color" />
+                        </div>
                     </div>
                     <div class="row">
                         <div class="title">Quantity</div>
-                        <input
-                            class="rewriteInput"
-                            name="quantity"
-                            v-model="product.quantity"
-                        />
+                        <div class="inputWrapper">
+                            <input
+                                class="rewriteInput"
+                                name="quantity"
+                                v-model="product.quantity"
+                            />
+                            <error-tooltip v-if="invalid.path.quantity" :message="invalid.path.quantity" />
+                        </div>
                     </div>
                     <div class="row">
                         <div class="title">Rating</div>
@@ -149,13 +256,16 @@
                     </div>
                 </div>
             </div>
-            <textarea
-                class="descriptionTextarea"
-                :value="product?.description"
-                @change="({ target }) => this.product.description = target.value"
-                placeholder="Add a description to a product"
-            />
-            <button class="submitBtn" @click="postUpdateInfo(this.product)">Submit</button>
+            <div class="inputWrapper">
+                <textarea
+                    class="descriptionTextarea"
+                    :value="product?.description"
+                    @change="({ target }) => this.product.description = target.value"
+                    placeholder="Add description to product"
+                ></textarea>
+                <error-tooltip v-if="invalid.path.description" :message="invalid.path.description" />
+            </div>
+            <button class="submitBtn" @click="postUpdateInfo()">Submit</button>
         </div>
         <div class="infoWrapper" v-else>
             <div class="wrapper">
@@ -175,7 +285,7 @@
                         <div class="title">Price</div>
                         <div class="infoItem">{{product?.price}}</div>
                     </div>
-                    <div class=row>
+                    <div class=row v-if="product?.color">
                         <div class="title">Color</div>
                         <div class="infoItem">{{product?.color}}</div>
                     </div>
@@ -187,9 +297,10 @@
                         <div class="title">Rating</div>
                         <div class="infoItem">{{getRating(product)}}</div>
                     </div>
+                </div>
             </div>
-            </div>
-            <div class="description">{{product?.description}}</div>
+            <div class="description" v-if="product?.description">{{product?.description}}</div>
+            <div class="description" v-if="!product?.description">Product doesn't have a description</div>
         </div>
     </div>    
 </template>
@@ -197,9 +308,12 @@
 <style scoped lang="scss">
     $lightGrayBorder: #bbbbbb;
     $borderHover: black;
-    $backgroundColor: black;
+    $btnBackgroundColor: black;
     $hoverTextColor: white;
     $containerBackground: white;
+    $deletionBackground: rgba(128, 128, 128, .6);
+    $red: red;
+    $white: white;
 
     .container {
         margin: auto;
@@ -211,7 +325,32 @@
         background-color: $containerBackground;
         border: 1px solid $lightGrayBorder;
         border-radius: 5px;
-        position: relative;
+
+        .deletionWrapper {
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: $deletionBackground;
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 1000;
+            scroll-behavior: none;
+
+            .deletionAccept {
+                margin-top: 20px;
+                width: 270px;
+                height: 200px;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                background-color: $white;
+                border: 1px solid $lightGrayBorder;
+            }
+        }
 
         .btnWrapper {
             padding: 5px;
@@ -219,6 +358,35 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
+
+            &.deletion {
+                justify-content: space-around;
+
+                .danger {
+                    padding: 6px 12px;
+                    width: 70px;
+                    background: none;
+                    border: 1px solid $red;
+                    color: $red;
+
+                    &:hover {
+                        background-color: $red;
+                        color: $white;
+                    }
+                }
+
+                .decline {
+                    padding: 6px 12px;
+                    width: 70px;
+                    background: none;
+                    border: 1px solid $lightGrayBorder;
+
+                    &:hover {
+                        background-color: $btnBackgroundColor;
+                        color: $white;
+                    }
+                }
+            }
 
             .backBtn,
             .rewriteBtn,
@@ -246,7 +414,7 @@
                     width: 90px;
                     border-radius: 5px;
                     border-color: $borderHover;
-                    background-color: $backgroundColor;
+                    background-color: $btnBackgroundColor;
                     color: $hoverTextColor;
 
                     .btnIcon {
@@ -269,11 +437,16 @@
             flex-direction: column;
             align-items: center;
 
-            .rewriteInput {
-                padding: 4px 8px;
-                width: 100px;
-                border: 1px solid $lightGrayBorder;
-                border-radius: 5px;
+            .inputWrapper {
+                margin-bottom: 15px;
+                position: relative;
+
+                .rewriteInput {
+                    padding: 4px 8px;
+                    width: 100px;
+                    border: 1px solid $lightGrayBorder;
+                    border-radius: 5px;
+                }
             }
 
             .imageInfo {
@@ -295,7 +468,7 @@
                 align-items: center;
 
                 .row {
-                    margin-bottom: 2px;
+                    margin-bottom: 4px;
                     padding-bottom: 3px;
                     width: 100%;
                     display: flex;
@@ -310,14 +483,18 @@
             }
         }
 
-        .descriptionTextarea {
-            margin-bottom: 10px;
-            width: 100%;
-            height: 200px;
-            display: flex;
-            resize: none;
-            font-size: 16px;
-            text-align: start;
+        .inputWrapper {
+            margin-bottom: 15px;
+            position: relative;
+
+            .descriptionTextarea {
+                width: 100%;
+                height: 200px;
+                display: flex;
+                resize: none;
+                font-size: 16px;
+                text-align: start;
+            }
         }
 
         .submitBtn {
@@ -332,7 +509,7 @@
             border-radius: 5px;
 
             &:hover {
-                background-color: $backgroundColor;
+                background-color: $btnBackgroundColor;
                 color: $hoverTextColor;
             }
         }
