@@ -9,7 +9,7 @@
             return {
                 search: '',
                 filtered: [],
-                allOrders: {}
+                allOrders: []
             }
         },
         created() {

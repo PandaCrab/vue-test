@@ -13,6 +13,7 @@ import {
     faTrash,
     faInfo,
     faFilter,
+    faCheck,
 } from '@fortawesome/free-solid-svg-icons';
 import {
     faStar,
@@ -40,6 +41,7 @@ library.add(
     faTrash,
     faInfo,
     faFilter,
+    faCheck,
 );
 
 const app = createApp(App);

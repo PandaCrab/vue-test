@@ -15,6 +15,16 @@
                 return () => window.removeEventListener('mousedown', this.clickOutside);
             })
         },
+        watch: {
+            isOpen: function() {
+                if (this.isOpen) {
+                    document.documentElement.style.overflow = 'hidden';
+                    return;
+                }
+
+                document.documentElement.style.overflow = 'auto';
+            }
+        },
         methods: {
             clickOutside({ target }) {
                 const el = this.$refs.menuRef;
