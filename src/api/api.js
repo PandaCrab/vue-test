@@ -79,3 +79,13 @@ export const getAllOrders = async () => {
         console.log(err);
     }
 };
+
+export const getOneOrder = async (id) => {
+    try {
+        const order = await fetchFunc(url + `/orders/${id}`, 'GET');
+
+        return order.json();
+    } catch (err) {
+        console.log(err);
+    }
+};
