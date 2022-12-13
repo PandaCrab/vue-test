@@ -1,10 +1,8 @@
 export const sortList = {
-    main: [
+    orderHistory: [
         'date',
-        'oredered-items',
+        'ordered-items',
         'payed',
-    ],
-    paymentType: [
         'online-payed',
         'post-office-payed',
         'payed-courier',
@@ -16,10 +14,10 @@ export const sortFunc = (arrToSort, sortBy) => {
 
     switch (sortBy) {
         case 'date':
-            sorted = [].concat(arrToSort).sort((a, b) => b.date - a.date);
+            sorted = arrToSort.sort((a, b) => a.date - b.date);
             break;
         case 'ordered-items':
-            sorted = [].concat(arrToSort).sort((a, b) => b.orderInfo.products.length - a.orderInfo.products.length);
+            sorted =[].concat(arrToSort).sort((a, b) => b.orderInfo.products.length - a.orderInfo.products.length);
             break;
         case 'payed':
             sorted = arrToSort.reduce((acc, el) => el.payment?.payed ? [el, ...acc] : [...acc, el], []);
@@ -36,7 +34,7 @@ export const sortFunc = (arrToSort, sortBy) => {
                 ...arrToSort.filter(({ payment }) => payment?.paymentType !== 'onPostOffice')
             ];
             break;
-        case 'to-courier':
+        case 'payed-courier':
             sorted = [
                 ...arrToSort.filter(({ payment }) => payment?.paymentType === 'toCourier'),
                 ...arrToSort.filter(({ payment }) => payment?.paymentType !== 'toCourier')
@@ -52,7 +50,7 @@ export const sortFunc = (arrToSort, sortBy) => {
 
 export const filterFunc = (arrToFilter, filterBy) => {
     let filtered;
-console.log(typeof filterBy === 'string')
+
     if (typeof filterBy === 'object') {
         const includesKeys = (objectKey) => {
             return Object.keys(filterBy).includes(objectKey);

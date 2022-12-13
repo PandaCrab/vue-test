@@ -1,19 +1,18 @@
 <script>
-    import { sortList, sortFunc } from '@/helpers/filters';
+    import { filterFunc } from '@/helpers/filters';
 
     export default {
         name: 'FilterBar',
         props: {
             setFiltered: Function,
-            sortingArr: Array,
+            arrToFilter: Array,
             orders: Boolean,
             products: Boolean,
         },
         data() {
             return {
-                sorted: [],
+                filtered: [],
                 isOpen: false,
-                sortCriteria: sortList,
                 choosenCriterion: ''
             }
         },
@@ -34,24 +33,27 @@
         methods: {
             clickOutside({ target }) {
                 const element = this.$refs.filterBarRef;
-
-                if (element && !element.contains(target)) {
-                    this.isopen = false
+                if (element && !element?.contains(target)) {
+                    this.isOpen = false
                 }
             },
             toggleBar() {
                 this.isOpen = !this.isOpen;
             },
-            onSort(sortBy) {
-                if (this.sorted) {
-                    sortFunc(this.sorted);
-                } else {
-                    sortFunc(this.sortingArr, sortBy);
-                }
-                this.choosenCriterion = sortBy;
+            onSelect(filterBy) {
+                const filter = filterFunc(this.arrToFilter, filterBy);
+
+                this.filtered = filter;
+
+                this.choosenCriterion = filterBy;
+            },
+            onClearFilter() {
+                this.filtered = [];
+                this.setFiltered(null);
+                this.choosenCriterion = '';
             },
             onSubmit() {
-                this.setFiltered(this.sorted)
+                this.setFiltered(this.filtered)
             },
         },
     }
@@ -59,54 +61,39 @@
  
 <template>
     <div class="filterBarContainer" ref="filterBarRef">
-        <button class="filterBtn" @click="this.toggleBar()">
+        <button class="filterBarBtn" @click="this.toggleBar()">
             <font-awesome-icon icon="fa-solid fa-filter" />
         </button>
         <div :class="filterBarClass">
             <div class="row">
-                <button class="clearFilter">
+                <button class="clearFilter" @click="() => onClearFilter()">
                     <div class="text">Clear filter</div>
                 </button>
-                <button @click="() => this.isOpen = false" class="filterBtn close">
+                <button @click="() => this.isOpen = false" class="filterBarBtn close">
                     <div class="icon"><font-awesome-icon icon="fa-solid fa-xmark" /></div>
                     <div class="text">Close bar</div>
                 </button>
             </div>
             <div class="title">Filters</div>
-            <div class="sortCriteria">
-                <div class="subtitle">Sorting</div>
+            <div class="filterCriteria">
+                <div class="subtitle">User info</div>
                 <div 
-                    class="item"
-                    v-for="criteria in sortCriteria?.main"
-                    :key="criteria.index"
-                    @click="() => onSort(criteria)"
+                    class="item" 
+                    v-for="(criteria, index) in [...new Set(arrToFilter.map((el) => el.username))]"
+                    :key="index"
+                    @click="() => onSelect({ username: criteria})"
                 >
-                    <div :class="`checkbox ${criteria === choosenCriterion && 'checked'}`">
-                        <font-awesome-icon
-                            v-if="criteria === choosenCriterion"
-                            icon="fa-solid fa-check"
-                        />
-                    </div>
-                    {{criteria.replace(/-/g, ' ')}}
-                </div>
-                <div class="subtitle">Payment type</div>
-                <div
-                    class="item"
-                    v-for="criteria in sortCriteria?.paymentType"
-                    :key="criteria.index"
-                    @click="() => onSort(criteria)"
-                >
-                    <div :class="`checkbox ${criteria === choosenCriterion && 'checked'}`">
-                        <font-awesome-icon
-                            v-if="criteria === choosenCriterion"
-                            icon="fa-solid fa-check"
-                        />
-                    </div>
-                    {{criteria.replace(/-/g, ' ')}}
+                    <div
+                        :class="`checkbox ${choosenCriterion.username === criteria && 'checked'}`"
+                        
+                    >
+                        <font-awesome-icon v-if="choosenCriterion?.username === criteria" icon="fa-solid fa-check" />
+                    </div> 
+                    <div>{{criteria}}</div>          
                 </div>
             </div>
+            <button class="filterBtn" @click="() => onSubmit()">Filter</button>
         </div>
-
     </div>
 </template>
 
@@ -124,7 +111,7 @@
         top: 0;
         right: 0;
 
-        .filterBtn {
+        .filterBarBtn {
             width: 30px;
             height: 30px;
             display: flex;
@@ -196,6 +183,7 @@
             border-left: 1px solid $lightGrayBorder;
             box-shadow: 3px 0 5px $shadowColor;
             transition: width .2s linear;
+            white-space: nowrap;
             overflow: hidden;
             position: fixed;
             top: 0;
@@ -263,6 +251,18 @@
                         text-shadow: 0 0 2px $lightGrayBorder;
                     }
                 }
+            }
+            
+            .filterBtn {
+                padding: 6px 12px;
+                width: 100px;
+                display: flex;
+                align-items: center;
+                align-self: center;
+                justify-content: center;
+                background: none;
+                border: 1px solid $lightGrayBorder;
+                border-radius: 5px;
             }
         }
     }

@@ -1,14 +1,14 @@
 <script>
     import FilterBar from '@/components/filterBar.vue';
+    import SortDropdown from '@/components/sortDropdown.vue';
     import { getAllOrders } from '../api/api';
-    import { filterFunc, sortFunc } from '../helpers/filters';
 
     export default {
         name: 'OrderHistory',
         data() {
             return {
                 search: '',
-                filtered: [],
+                filtered: null,
                 allOrders: []
             }
         },
@@ -30,16 +30,16 @@
 
                 return `${time} ${date}`;
             },
-            onSort(sortBy) {
-                this.filtered = sortFunc(this.allOrders, sortBy);
+            onSort(sort) {
+                this.allOrders = sort;
             },
-            onFilter(filterBy) {
-                this.filtered = filterFunc(this.allOrders, filterBy);
-                console.log(this.filtered)
-            },
+            onFilter(filter) {
+                this.filtered = filter;
+            }
         },
         components: {
-            FilterBar
+            FilterBar,
+            SortDropdown,
         }
     }
 </script>
@@ -47,16 +47,16 @@
 <template>
     <div class="ordersContainer">
         <FilterBar
-            :setFiltered="(arr) => this.filtered = arr"
-            :sortingArr="this.allOrders"
+            :setFiltered="(arr) => onFilter(arr)"
+            :arrToFilter="this.allOrders"
             orders
         />
         <h1>Orders history</h1>
-        <button @click="onFilter({ username: 'John Doe' })">online</button>
+        <SortDropdown :arrToSort="allOrders" :setSorted="onSort" />
         <div class="ordersList" v-if="allOrders?.length">
             <div 
                 class="orderWrapper"
-                v-for="order in (filtered?.length ? filtered : allOrders)"
+                v-for="order in (filtered ?? allOrders)"
                 :key="order._id"
             >
                 <button class="infoBtn" @click="() => this.$router.push(`/order/${order._id}`)">
