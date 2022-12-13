@@ -52,8 +52,8 @@ export const sortFunc = (arrToSort, sortBy) => {
 
 export const filterFunc = (arrToFilter, filterBy) => {
     let filtered;
-
-    if (filterBy === Object) {
+console.log(typeof filterBy === 'string')
+    if (typeof filterBy === 'object') {
         const includesKeys = (objectKey) => {
             return Object.keys(filterBy).includes(objectKey);
         };
@@ -71,7 +71,7 @@ export const filterFunc = (arrToFilter, filterBy) => {
         }
     }
 
-    if (filterBy === String) {
+    if (typeof filterBy === 'string') {
         switch (filterBy) {
             case filterBy.username:
                 filtered = arrToFilter.filter((el) => el.username === filterBy.username);
@@ -90,7 +90,7 @@ export const filterFunc = (arrToFilter, filterBy) => {
                 filtered = arrToFilter.filter(({ payment }) => payment?.paymnetType === 'online');
                 break;
             case 'toPostOffice':
-                filtered = arrToFilter.filter(({ payment }) => payment?.paymentType === 'topostOffice');
+                filtered = arrToFilter.filter(({ payment }) => payment?.paymentType === 'toPostOffice');
                 break;
             case 'toCourier':
                 filtered = arrToFilter.filter(({ payment }) => payment?.paymentType === 'toCourier');

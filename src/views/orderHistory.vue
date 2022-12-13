@@ -21,8 +21,8 @@
 
                 this.allOrders = res;
             },
-            isPayed(item) {
-                return item ? 'Yes' : 'No'
+            isPayed(payed) {
+                return payed ? 'Yes' : 'No'
             },
             dateFormater(dateToFormat) {
                 const time = new Date(dateToFormat).toLocaleTimeString();
@@ -52,10 +52,14 @@
             orders
         />
         <h1>Orders history</h1>
-        <button @click="onFilter({username: 'John Doe'})">online</button>
+        <button @click="onFilter({ username: 'John Doe' })">online</button>
         <div class="ordersList" v-if="allOrders?.length">
-            <div class="orderWrapper" v-for="order in (filtered.length ? filtered : allOrders)" :key="order._id">
-                <button class="infoBtn">
+            <div 
+                class="orderWrapper"
+                v-for="order in (filtered?.length ? filtered : allOrders)"
+                :key="order._id"
+            >
+                <button class="infoBtn" @click="() => this.$router.push(`/order/${order._id}`)">
                     <div class="icon"><font-awesome-icon icon="fa-solid fa-info" /></div>
                     <div class="text">More info</div>
                 </button>

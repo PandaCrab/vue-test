@@ -13,6 +13,13 @@
                     this.closePreview();
                 }
             },
+            getRating({ stars }) {
+                const { five, four, three, two, one } = stars;
+
+                return (
+                    (5*five + 4*four + 3*three + 2*two + 1*one) / (five + four + three + two + one)
+                ).toFixed(2);
+            }
         },
         created() {
             document.addEventListener('mousedown', this.clickOutside);
@@ -42,10 +49,20 @@
                 <div>{{this.product.color}}</div>
                 <div>{{this.product.quantity}}</div>
                 <div class="starsWrapper">
-                    <div class="star" v-for="star in [...Array(5)]" :key="star?.index">
-                        <font-awesome-icon icon="fa-regular fa-star" />
+                    <div class="star" v-for="(star, index) in [...Array(5)]" :key="index">
+                        <font-awesome-icon 
+                            :icon="(index + 1) > getRating(product) ? 'fa-regular fa-star' : 'fa-solid fa-star'" 
+                        />
                     </div>
                 </div>
+            </div>
+        </div>
+        <div class="btnsWrapper">
+            <div class="btn">
+                <font-awesome-icon icon="fa-solid fa-cart-shopping" />
+            </div>
+            <div class="btn">
+                <font-awesome-icon icon="fa-regular fa-heart" />
             </div>
         </div>
     </div>
@@ -56,11 +73,11 @@
     $containerBackground: white;
     $white: white;
     $black: black;
+    $starColor: rgb(255, 217, 0);
 
     .cardContainer {
         margin: auto;
-        padding: 10px;
-        width: 230px;
+        width: 270px;
         height: 200px;
         display: flex;
         flex-direction: column;
@@ -90,9 +107,11 @@
         }
 
         .infoWrapper {
-            width: 100%;
+            padding: 10px;
             display: flex;
             flex-direction: row;
+            align-items: center;
+            align-content: center;
 
             .productImage {
             margin-right: 10px;
@@ -107,13 +126,13 @@
                 align-items: flex-end;
 
                 &>div {
-                    margin-bottom: 2px;
+                    margin-bottom: 5px;
                 }
 
                 .name {
+                    margin-bottom: 10px; 
                     text-align: end;
                     font-weight: bold;
-                    margin-bottom: 5px
                 }
 
                 .starsWrapper {
@@ -123,7 +142,32 @@
 
                 .star {
                     margin-left: 2px;
+                    color: $starColor;
+                }
+            }
+        }
+        
+        .btnsWrapper {
+            padding: 5px;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            align-self: end;
+            justify-content: flex-end;
+            border-top: 1px solid $lightGrayBorder;
 
+            .btn {
+                margin-right: 10px;
+                width: 25px;
+                height: 25px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                border: 1px solid $lightGrayBorder;
+                border-radius: 50%;
+
+                &:last-child {
+                    margin-right: 0;
                 }
             }
         }

@@ -14,9 +14,10 @@ import {
     faInfo,
     faFilter,
     faCheck,
+    faStar,
 } from '@fortawesome/free-solid-svg-icons';
 import {
-    faStar,
+    faStar as fillStar,
     faHeart,
     faEye as regularEye,
 } from '@fortawesome/free-regular-svg-icons';
@@ -34,6 +35,7 @@ library.add(
     faArrowLeft,
     faPen,
     faStar,
+    fillStar,
     faCartShopping,
     faHeart,
     faEye,

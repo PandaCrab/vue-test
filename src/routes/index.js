@@ -5,6 +5,7 @@ import AddProduct from '../views/addProduct.vue';
 import StorageProducts from '../views/storageProducts.vue';
 import ProductInfo from '../views/productInfo.vue';
 import OrderHistory from '../views/orderHistory.vue';
+import OrderInfo from '../views/orderInfo.vue';
 
 const routes = [
     { path: '/', name: 'HomePage', component: HomePage },
@@ -12,6 +13,7 @@ const routes = [
     { path: '/add_product', name: 'AddProduct', component: AddProduct },
     { path: '/product/:id', name: 'ProductInfo', component: ProductInfo },
     { path: '/order_history', name: 'OrderHistory', component: OrderHistory },
+    { path: '/order/:id', name: 'OrderInfo', component: OrderInfo },
 ];
 
 const router = createRouter({

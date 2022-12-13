@@ -82,7 +82,7 @@
                     @click="() => onSort(criteria)"
                 >
                     <div :class="`checkbox ${criteria === choosenCriterion && 'checked'}`">
-                        <font-awesome-icons
+                        <font-awesome-icon
                             v-if="criteria === choosenCriterion"
                             icon="fa-solid fa-check"
                         />
@@ -97,7 +97,7 @@
                     @click="() => onSort(criteria)"
                 >
                     <div :class="`checkbox ${criteria === choosenCriterion && 'checked'}`">
-                        <font-awesome-icons
+                        <font-awesome-icon
                             v-if="criteria === choosenCriterion"
                             icon="fa-solid fa-check"
                         />
