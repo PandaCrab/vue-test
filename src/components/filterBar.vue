@@ -44,7 +44,7 @@
                 const filter = filterFunc(this.arrToFilter, filterBy);
 
                 this.filtered = filter;
-
+console.log(this.filtered)
                 this.choosenCriterion = filterBy;
             },
             onClearFilter() {
@@ -55,6 +55,13 @@
             onSubmit() {
                 this.setFiltered(this.filtered)
             },
+            arrForProductName() {
+                return [...new Set(this.arrToFilter.map(
+                    (el) => el.orderInfo.products.map(
+                        (el) => el && el?.name
+                    )).flat()
+                )];
+            }
         },
     }
 </script>
@@ -76,20 +83,61 @@
             </div>
             <div class="title">Filters</div>
             <div class="filterCriteria">
-                <div class="subtitle">User info</div>
+                <div class="subtitle">User:</div>
+                <div class="subtitle">Username</div>
                 <div 
                     class="item" 
-                    v-for="(criteria, index) in [...new Set(arrToFilter.map((el) => el.username))]"
+                    v-for="(username, index) in [...new Set(arrToFilter.map((el) => el.username))]"
                     :key="index"
-                    @click="() => onSelect({ username: criteria})"
+                    @click="() => onSelect({ username })"
                 >
                     <div
-                        :class="`checkbox ${choosenCriterion.username === criteria && 'checked'}`"
-                        
+                        :class="`checkbox ${choosenCriterion.username === username && 'checked'}`"
                     >
-                        <font-awesome-icon v-if="choosenCriterion?.username === criteria" icon="fa-solid fa-check" />
+                        <font-awesome-icon v-if="choosenCriterion?.username === username" icon="fa-solid fa-check" />
                     </div> 
-                    <div>{{criteria}}</div>          
+                    <div>{{username}}</div>          
+                </div>
+                <div class="subtitle">Products:</div>
+                <div 
+                    class="item"
+                    v-for="(productName, index) in arrForProductName()"
+                    :key="index"
+                    @click="() => onSelect({ productName })"
+                >
+                    <div :class="`checkbox ${choosenCriterion?.productName === productName && 'checked'}`">
+                        <font-awesome-icon 
+                            v-if="choosenCriterion?.productName === productName"
+                            icon="fa-solid fa-check" 
+                        />
+                    </div>
+                    <div>{{productName}}</div>
+                </div>
+                <div class="subtitle">Order info:</div>
+                <div class="item" @click="() => onSelect('payed')">
+                    <div :class="`checkbox ${choosenCriterion === 'payed' && 'checked'}`">
+                        <font-awesome-icon v-if="choosenCriterion === 'payed'" icon="fa-solid fa-check" />
+                    </div>
+                    <div>payed</div>
+                </div>
+                <div class="subtitle">Payment type</div>
+                <div class="item" @click="() => onSelect('online')">
+                    <div :class="`checkbox ${choosenCriterion === 'online' && 'checked'}`">
+                        <font-awesome-icon v-if="choosenCriterion === 'online'" icon="fa-solid fa-check" />
+                    </div>
+                    <div>online</div>
+                </div>
+                <div class="item" @click="() => onSelect('toPostOffice')">
+                    <div :class="`checkbox ${choosenCriterion === 'toPostOffice' && 'checked'}`">
+                        <font-awesome-icon v-if="choosenCriterion === 'toPostOffice'" icon="fa-solid fa-check" />
+                    </div>
+                    <div>post office payed</div>
+                </div>
+                <div class="item" @click="() => onSelect('toCourier')">
+                    <div :class="`checkbox ${choosenCriterion === 'toCourier' && 'checked'}`">
+                        <font-awesome-icon v-if="choosenCriterion === 'toCourier'" icon="fa-solid fa-check" />
+                    </div>
+                    <div>payed courier</div>
                 </div>
             </div>
             <button class="filterBtn" @click="() => onSubmit()">Filter</button>
@@ -98,6 +146,9 @@
 </template>
 
 <style scoped lang="scss">
+    @use '../assets/styles/mixins/MediaMixins.module.scss' as media;
+    @use '../assets/styles/mixins/ScrollbarMixin.module.scss' as *;
+
     $lightGrayBorder: #bbbbbb;
     $hoveredItem: rgb(243, 243, 243);
     $shadowColor: gray;
@@ -130,8 +181,8 @@
             }
 
             &.close {
-                width: 20px;
-                height: 20px;
+                width: 25px;
+                height: 25px;
                 position: static;
                 transition: width .2s linear;
 
@@ -161,7 +212,7 @@
         .clearFilter {
             padding: 6px 12px;
             width: 100px;
-            height: 20px;
+            height: 25px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -185,6 +236,7 @@
             transition: width .2s linear;
             white-space: nowrap;
             overflow: hidden;
+            overflow-y: scroll;
             position: fixed;
             top: 0;
             right: 0;
@@ -199,6 +251,8 @@
                 border: none;
                 box-shadow: none;
             }
+
+            @include scrollbars(1px, $lightGrayBorder, none);
 
             .row {
                 margin-bottom: 10px;
@@ -230,6 +284,10 @@
                 align-items: center;
                 justify-content: flex-start;
 
+                &:last-child {
+                    margin-bottom: 20px;
+                }
+
                 &:hover {
                     background-color: $hoveredItem;
                     font-weight: bold;
@@ -237,8 +295,9 @@
 
                 .checkbox {
                     margin-right: 10px;
-                    width: 20px;
-                    height: 20px;
+                    padding: 2px;
+                    width: 12px;
+                    height: 12px;
                     display: flex;
                     align-items: center;
                     justify-content: center;

@@ -54,8 +54,10 @@
         <h1>Orders history</h1>
         <SortDropdown :arrToSort="allOrders" :setSorted="onSort" />
         <div class="ordersList" v-if="allOrders?.length">
+            <div v-if="filtered && !filtered.length">Not matches found</div>
             <div 
                 class="orderWrapper"
+                v-else
                 v-for="order in (filtered ?? allOrders)"
                 :key="order._id"
             >

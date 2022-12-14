@@ -61,31 +61,25 @@ export const filterFunc = (arrToFilter, filterBy) => {
         }
 
         if (includesKeys('productName')) {
-            filtered = arrToFilter.map(
-                (product) => product.orderInfo.products.filter(
-                    ({ name }) => name === filterBy.productName
-                )
+            filtered = arrToFilter.filter(
+                (el) => {
+                    const names = el.orderInfo.products.filter(({ name }) => name === filterBy.productName);
+
+                    if (names.length) {
+                        return el;
+                    }
+                }
             );
         }
     }
 
     if (typeof filterBy === 'string') {
         switch (filterBy) {
-            case filterBy.username:
-                filtered = arrToFilter.filter((el) => el.username === filterBy.username);
-                break;
-            case filterBy.productName:
-                filtered = arrToFilter.map((el) => el.orderInfo.products.forEach((product) => {
-                    if (product.name === filterBy.productName) {
-                        return product
-                    }
-                }));
-                break;
             case 'payed': 
-                filtered = arrToFilter.filter(({ payment }) => payment?.payed);
+                filtered = [].concat(arrToFilter.filter(({ payment }) => payment?.payed));
                 break;
             case 'online':
-                filtered = arrToFilter.filter(({ payment }) => payment?.paymnetType === 'online');
+                filtered = arrToFilter.filter(({ payment }) => payment?.paymentType === 'online');
                 break;
             case 'toPostOffice':
                 filtered = arrToFilter.filter(({ payment }) => payment?.paymentType === 'toPostOffice');
