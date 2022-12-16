@@ -1,5 +1,6 @@
 <script>
-    import { filterFunc } from '@/helpers/filters';
+    import { getProduct } from '@/api/api';
+import { filterFunc } from '@/helpers/filters';
 
     export default {
         name: 'FilterBar',
@@ -44,7 +45,7 @@
                 const filter = filterFunc(this.arrToFilter, filterBy);
 
                 this.filtered = filter;
-console.log(this.filtered)
+
                 this.choosenCriterion = filterBy;
             },
             onClearFilter() {
@@ -55,12 +56,14 @@ console.log(this.filtered)
             onSubmit() {
                 this.setFiltered(this.filtered)
             },
-            arrForProductName() {
-                return [...new Set(this.arrToFilter.map(
-                    (el) => el.orderInfo.products.map(
-                        (el) => el && el?.name
-                    )).flat()
-                )];
+            async arrForProductName() {
+                const ids = await [...new Set(this.arrToFilter.map(
+                    (el) => el.orderInfo.products.map((product) => product._id)
+                ).flat())];
+console.log(ids)
+                const products = await getProduct(ids).then((el) => el.map(({ _id, name }) => { _id, name}));
+console.log(products)
+                return products;
             }
         },
     }
@@ -101,17 +104,17 @@ console.log(this.filtered)
                 <div class="subtitle">Products:</div>
                 <div 
                     class="item"
-                    v-for="(productName, index) in arrForProductName()"
+                    v-for="({ _id, name }, index) in arrForProductName()"
                     :key="index"
-                    @click="() => onSelect({ productName })"
+                    @click="() => onSelect({ productName: _id })"
                 >
-                    <div :class="`checkbox ${choosenCriterion?.productName === productName && 'checked'}`">
+                    <div :class="`checkbox ${choosenCriterion === _id && 'checked'}`">
                         <font-awesome-icon 
-                            v-if="choosenCriterion?.productName === productName"
+                            v-if="choosenCriterion === _id"
                             icon="fa-solid fa-check" 
                         />
                     </div>
-                    <div>{{productName}}</div>
+                    <div>{{name}}</div>
                 </div>
                 <div class="subtitle">Order info:</div>
                 <div class="item" @click="() => onSelect('payed')">

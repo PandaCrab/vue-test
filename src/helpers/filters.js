@@ -63,7 +63,7 @@ export const filterFunc = (arrToFilter, filterBy) => {
         if (includesKeys('productName')) {
             filtered = arrToFilter.filter(
                 (el) => {
-                    const names = el.orderInfo.products.filter(({ name }) => name === filterBy.productName);
+                    const names = el.orderInfo.products.filter(({ _id }) => _id === filterBy.productName);
 
                     if (names.length) {
                         return el;

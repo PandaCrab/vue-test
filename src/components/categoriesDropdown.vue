@@ -120,7 +120,7 @@
                 <input
                     name="searchInput"
                     ref="searchInput"
-                    :class="`dropdownText ${this.invalidCategory && 'error'}`"
+                    :class="`dropdownText search ${this.invalidCategory && 'error'}`"
                     :value="this.search"
                     @change="({ target }) => this.search = target.value"
                     autofocuse
@@ -240,6 +240,11 @@
                     font-size: 14px;
                     border: none;
                     border-radius: 5px;
+                    cursor: pointer;
+
+                    &.search {
+                        cursor: text;
+                    }
 
                     &:focus {
                         outline: none;
@@ -260,6 +265,7 @@
                     justify-content: center;
                     font-size: 18px;
                     transition: rotate .2s linear;
+                    cursor: pointer;
 
                     &.up {
                         rotate: 0deg;

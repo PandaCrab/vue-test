@@ -14,11 +14,15 @@
                 }
             },
             getRating({ stars }) {
-                const { five, four, three, two, one } = stars;
+                if (stars) {
+                    const { five, four, three, two, one } = stars;
 
-                return (
-                    (5*five + 4*four + 3*three + 2*two + 1*one) / (five + four + three + two + one)
-                ).toFixed(2);
+                    return (
+                        (5*five + 4*four + 3*three + 2*two + 1*one) / (five + four + three + two + one)
+                    ).toFixed(2);
+                } else {
+                    return 0;
+                }
             }
         },
         created() {

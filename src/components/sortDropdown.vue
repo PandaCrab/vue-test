@@ -166,6 +166,7 @@
                 height: 0;
                 border: none;
                 box-shadow: none;
+                overflow: hidden;
             }
 
             .item {

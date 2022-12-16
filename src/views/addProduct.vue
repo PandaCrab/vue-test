@@ -172,7 +172,13 @@
             </div>
             <div class="btnWrapper">
                 <button @click="onSubmit()">Submit</button>
-                <button v-if="!this.previewCard" @click="this.previewCard = true">show</button>
+                <button
+                    :disabled="!formValues.imgUrl"
+                    v-if="!this.previewCard"
+                    @click="this.previewCard = true"
+                >
+                    show
+                </button>
             </div>
         </div>
     </div>
@@ -209,6 +215,20 @@
                 &:hover {
                     background-color: $black;
                     color: $white;
+                }
+
+                &:disabled {
+                    color: $lightGrayBorder;
+
+                    &:active {
+                        background: none;
+                        color: $lightGrayBorder
+                    }
+
+                    &:hover {
+                        background: none;
+                        color: $lightGrayBorder;
+                    }
                 }
             }
 
