@@ -25,7 +25,7 @@ export const getProducts = async (ids) => {
     try {
         if (ids) {
             const res = await fetchFunc(url + '/storage', 'POST', ids);
-            console.log(ids);
+
             return res.json();
         }
 

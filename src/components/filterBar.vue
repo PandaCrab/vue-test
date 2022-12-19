@@ -14,8 +14,12 @@ import { filterFunc } from '@/helpers/filters';
             return {
                 filtered: [],
                 isOpen: false,
-                choosenCriterion: ''
+                choosenCriterion: '',
+                productName: [],
             }
+        },
+        created() {
+            this.getProductsName();
         },
         updated() {
             this.$nextTick(() => {
@@ -42,11 +46,18 @@ import { filterFunc } from '@/helpers/filters';
                 this.isOpen = !this.isOpen;
             },
             onSelect(filterBy) {
-                const filter = filterFunc(this.arrToFilter, filterBy);
+                if (this.choosenCriterion == filterBy){
+                    this.filtered = null;
 
-                this.filtered = filter;
+                    this.choosenCriterion = '';
+                }
 
-                this.choosenCriterion = filterBy;
+                if (this.choosenCriterion !== filterBy) {
+                    const filter = filterFunc(this.arrToFilter, filterBy);
+                    
+                    this.filtered = filter;
+                    this.choosenCriterion = filterBy;
+                }
             },
             onClearFilter() {
                 this.filtered = [];
@@ -56,15 +67,18 @@ import { filterFunc } from '@/helpers/filters';
             onSubmit() {
                 this.setFiltered(this.filtered)
             },
-            async arrForProductName() {
-                const ids = await [...new Set(this.arrToFilter.map(
-                    (el) => el.orderInfo.products.map((product) => product._id)
-                ).flat())];
+            async getProductsName() {
+                try {
+                    const ids = await [...new Set(this.arrToFilter.map(
+                        (el) => el.orderInfo.products.map((product) => product._id)
+                    ).flat())];
 
-                if (ids.length) {
-                    const products = await getProducts(ids).then((el) => el.map(({ _id, name }) => ({ _id, name})));
+                    const products = await getProducts(ids)
+                        .then((ids) => ids.map(({ _id, name }) => ({ _id, name})));
 
-                    return products;
+                    this.productName = products;
+                } catch (err) {
+                    console.log(err);
                 }
             }
         },
@@ -106,13 +120,13 @@ import { filterFunc } from '@/helpers/filters';
                 <div class="subtitle">Products:</div>
                 <div 
                     class="item"
-                    v-for="({ _id, name }, index) in arrForProductName()"
+                    v-for="({ _id, name }, index) in productName"
                     :key="index"
                     @click="() => onSelect({ productName: _id })"
                 >
-                    <div :class="`checkbox ${choosenCriterion === _id && 'checked'}`">
+                    <div :class="`checkbox ${choosenCriterion.productName === _id && 'checked'}`">
                         <font-awesome-icon 
-                            v-if="choosenCriterion === _id"
+                            v-if="choosenCriterion.productName === _id"
                             icon="fa-solid fa-check" 
                         />
                     </div>
@@ -145,7 +159,13 @@ import { filterFunc } from '@/helpers/filters';
                     <div>payed courier</div>
                 </div>
             </div>
-            <button class="filterBtn" @click="() => onSubmit()">Filter</button>
+            <button 
+                class="filterBtn" 
+                @click="() => onSubmit()"
+                :disabled="!this.choosenCriterion"
+            >
+                Filter
+            </button>
         </div>
     </div>
 </template>
@@ -327,6 +347,30 @@ import { filterFunc } from '@/helpers/filters';
                 background: none;
                 border: 1px solid $lightGrayBorder;
                 border-radius: 5px;
+
+                &:hover {
+                    background-color: $black;
+                    color: $white;
+                    box-shadow: 0 1px 7px $shadowColor;
+                }
+
+                &:active {
+                    box-shadow: 0 0 5px $shadowColor;
+                }
+
+                &:disabled {
+                    color: $lightGrayBorder;
+
+                    &:hover {
+                        background: none;
+                        color: $lightGrayBorder;
+                        box-shadow: none;
+                    }
+
+                    &:active {
+                        box-shadow: none;
+                    }
+                }
             }
         }
     }
