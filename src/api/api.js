@@ -21,11 +21,19 @@ const fetchFunc = (url, method, data) => {
 };
 
 //products api
-export const getProducts = async () => {
+export const getProducts = async (ids) => {
     try {
-        const res = await fetchFunc(url + '/storage', 'GET');
-        
-        return res.json();
+        if (ids) {
+            const res = await fetchFunc(url + '/storage', 'POST', ids);
+            console.log(ids);
+            return res.json();
+        }
+
+        if (!ids) {
+            const res = await fetchFunc(url + '/storage', 'GET');
+            console.error(ids)
+            return res.json();
+        }
     } catch (err) {
         return err;
     }

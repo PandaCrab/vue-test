@@ -1,5 +1,5 @@
 <script>
-    import { getProduct } from '@/api/api';
+    import { getProducts } from '@/api/api';
 import { filterFunc } from '@/helpers/filters';
 
     export default {
@@ -60,10 +60,12 @@ import { filterFunc } from '@/helpers/filters';
                 const ids = await [...new Set(this.arrToFilter.map(
                     (el) => el.orderInfo.products.map((product) => product._id)
                 ).flat())];
-console.log(ids)
-                const products = await getProduct(ids).then((el) => el.map(({ _id, name }) => { _id, name}));
-console.log(products)
-                return products;
+
+                if (ids.length) {
+                    const products = await getProducts(ids).then((el) => el.map(({ _id, name }) => ({ _id, name})));
+
+                    return products;
+                }
             }
         },
     }
