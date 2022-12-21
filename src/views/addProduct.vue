@@ -15,10 +15,7 @@
                     isValidate: false
                 }
             }
-        },
-        updated() {
-            console.log(this?.formValues)
-        },  
+        }, 
         methods: {
             onSubmit() {
                 addProductSchema

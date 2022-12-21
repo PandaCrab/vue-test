@@ -1,6 +1,6 @@
 <script>
     import { getProducts } from '@/api/api';
-import { filterFunc } from '@/helpers/filters';
+    import { filterFunc } from '@/helpers/filters';
 
     export default {
         name: 'FilterBar',
@@ -25,6 +25,10 @@ import { filterFunc } from '@/helpers/filters';
             this.$nextTick(() => {
                 if (this.isOpen) {
                     window.addEventListener('mousedown', this.clickOutside);
+                }
+
+                if (!this.productName.length) {
+                    this.getProductsName()
                 }
 
                 return () => window.removeEventListener('mousedown', this.clickOutside);
